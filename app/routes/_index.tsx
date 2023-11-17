@@ -1,4 +1,6 @@
 import { useNavigation } from '@remix-run/react';
+import LCDDropdown from '~/components/LCDDropdown';
+import { getLCDs } from '~/data/scrape';
 
 export default function Index() {
   // const navigate = useNavigation();
@@ -14,11 +16,15 @@ export default function Index() {
           Scraper
         </h1>
 
-        {/* <LCDDropdown /> */}
+        <LCDDropdown />
       </div>
 
       {/* {navigate.state === 'submitting' && <LoadingSpinner className="my-10" />}
       {data && <DataCard />} */}
     </main>
   );
+}
+
+export async function loader() {
+  return await getLCDs();
 }
