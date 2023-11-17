@@ -1,10 +1,58 @@
-import puppeteer from 'puppeteer';
+// import puppeteer from 'puppeteer-core';
+import chromium from 'chrome-aws-lambda';
+
 import type { lcdDataType } from 'types';
 
-type hcpsData = {
-  code: string;
-  description: string;
-};
+export async function getLCDs() {
+  try {
+    const browser = await chromium.puppeteer.launch({
+      args: [...chromium.args, '--hide-scrollbars', '--disable-web-security'],
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath,
+      headless: true,
+      ignoreHTTPSErrors: true,
+    });
+    const page = await browser.newPage();
+    const url = 'https://cgsmedicare.com/jc/coverage/lcdinfo.html';
+
+    await page.goto(url);
+    await page.setViewport({ width: 1080, height: 1024 });
+
+    const tableSelector = 'table.greenbackground';
+    const table = await page.$(tableSelector);
+
+    if (table) {
+      const data = await table.evaluate((table) => {
+        const rows = Array.from(table.querySelectorAll('tr'));
+
+        const rowData: lcdDataType[] = [];
+
+        rows.slice(1).forEach((row) => {
+          const columns = row.querySelectorAll('td');
+          if (columns.length > 0) {
+            const link = columns[0].querySelector('a');
+            if (link) {
+              rowData.push({
+                text: link.textContent as string,
+                url: link.href,
+              });
+            }
+          }
+        });
+
+        return rowData;
+      });
+
+      await browser.close();
+      return data;
+    } else {
+      throw new Error('Table not found on the page.');
+    }
+  } catch (error) {
+    console.error('An error occurred:', error);
+    return []; // Return an empty array or handle the error as needed.
+  }
+}
 
 // export async function scrape(url: string) {
 //   console.log('scrape ~ url:', url);
@@ -86,48 +134,3 @@ type hcpsData = {
 //     hcpscCodes,
 //   };
 // }
-
-export async function getLCDs() {
-  try {
-    const browser = await puppeteer.launch({ headless: 'new' });
-    const page = await browser.newPage();
-    const url = 'https://cgsmedicare.com/jc/coverage/lcdinfo.html';
-
-    await page.goto(url);
-    await page.setViewport({ width: 1080, height: 1024 });
-
-    const tableSelector = 'table.greenbackground';
-    const table = await page.$(tableSelector);
-
-    if (table) {
-      const data = await table.evaluate((table) => {
-        const rows = Array.from(table.querySelectorAll('tr'));
-
-        const rowData: lcdDataType[] = [];
-
-        rows.slice(1).forEach((row) => {
-          const columns = row.querySelectorAll('td');
-          if (columns.length > 0) {
-            const link = columns[0].querySelector('a');
-            if (link) {
-              rowData.push({
-                text: link.textContent as string,
-                url: link.href,
-              });
-            }
-          }
-        });
-
-        return rowData;
-      });
-
-      await browser.close();
-      return data;
-    } else {
-      throw new Error('Table not found on the page.');
-    }
-  } catch (error) {
-    console.error('An error occurred:', error);
-    return []; // Return an empty array or handle the error as needed.
-  }
-}
