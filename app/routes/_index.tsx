@@ -25,12 +25,12 @@ export default function Index() {
   );
 }
 
-export async function loader() {
-  try {
-    const lcdData = await getLCDs();
-    return lcdData;
-  } catch (error) {
-    console.error(error);
-    return error;
-  }
-}
+// export async function loader() {
+//   try {
+//     const lcdData = await getLCDs();
+//     return lcdData;
+//   } catch (error) {
+//     console.error(error);
+//     return error;
+//   }
+// }

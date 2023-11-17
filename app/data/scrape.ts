@@ -87,40 +87,40 @@ export async function scrape(url: string) {
   };
 }
 
-export async function getLCDs() {
-  const browser = await puppeteer.launch({ headless: 'new' });
-  const page = await browser.newPage();
-  const url = 'https://cgsmedicare.com/jc/coverage/lcdinfo.html';
+// export async function getLCDs() {
+//   const browser = await puppeteer.launch({ headless: 'new' });
+//   const page = await browser.newPage();
+//   const url = 'https://cgsmedicare.com/jc/coverage/lcdinfo.html';
 
-  await page.goto(url);
-  await page.setViewport({ width: 1080, height: 1024 });
+//   await page.goto(url);
+//   await page.setViewport({ width: 1080, height: 1024 });
 
-  const tableSelector = 'table.greenbackground';
-  const table = await page.$(tableSelector);
+//   const tableSelector = 'table.greenbackground';
+//   const table = await page.$(tableSelector);
 
-  if (table) {
-    const data = await table.evaluate((table) => {
-      const rows = Array.from(table.querySelectorAll('tr'));
+//   if (table) {
+//     const data = await table.evaluate((table) => {
+//       const rows = Array.from(table.querySelectorAll('tr'));
 
-      const rowData: lcdDataType[] = [];
+//       const rowData: lcdDataType[] = [];
 
-      rows.slice(1).forEach((row) => {
-        const columns = row.querySelectorAll('td');
-        if (columns.length > 0) {
-          const link = columns[0].querySelector('a');
-          if (link) {
-            rowData.push({
-              text: link.textContent as string,
-              url: link.href,
-            });
-          }
-        }
-      });
+//       rows.slice(1).forEach((row) => {
+//         const columns = row.querySelectorAll('td');
+//         if (columns.length > 0) {
+//           const link = columns[0].querySelector('a');
+//           if (link) {
+//             rowData.push({
+//               text: link.textContent as string,
+//               url: link.href,
+//             });
+//           }
+//         }
+//       });
 
-      return rowData;
-    });
+//       return rowData;
+//     });
 
-    await browser.close();
-    return data;
-  }
-}
+//     await browser.close();
+//     return data;
+//   }
+// }
