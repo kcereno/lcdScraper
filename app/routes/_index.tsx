@@ -26,5 +26,11 @@ export default function Index() {
 }
 
 export async function loader() {
-  return await getLCDs();
+  try {
+    const lcdData = await getLCDs();
+    return lcdData;
+  } catch (error) {
+    console.error(error);
+    return error;
+  }
 }
