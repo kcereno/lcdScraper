@@ -6,6 +6,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useRouteError,
 } from '@remix-run/react';
 
 import stylesheet from '~/tailwind.css';
@@ -16,7 +17,10 @@ export const links: LinksFunction = () => [
 
 export default function App() {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      data-theme="nord"
+    >
       <head>
         <meta charSet="utf-8" />
         <meta
@@ -26,11 +30,32 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
-        <Outlet />
+      <body className="">
+        <main className="mx-auto max-w-7xl">
+          <Outlet />
+        </main>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
+      </body>
+    </html>
+  );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+  console.error(error);
+  return (
+    <html>
+      <head>
+        <title>Oh no!</title>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <h1>error</h1>
+
+        <Scripts />
       </body>
     </html>
   );
